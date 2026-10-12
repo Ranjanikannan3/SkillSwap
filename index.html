@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Community Skill Exchange and Learning Network System - Discover peers, swap knowledge, set goals, track learning streaks, and expand your network.">
+  <title>SkillSwap · Community Skill Exchange &amp; Learning Network</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Auth Screen -->
+  <div id="auth" class="auth hidden">
+    <div class="auth-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    
+    <div class="auth-card">
+      <div class="brand big">
+        <span class="logo">⇄</span>
+        <span>SkillSwap</span>
+      </div>
+      <p class="tagline">Community Skill Exchange &amp; Learning Network</p>
+      <p class="muted center text-sm mb-4">Teach what you master. Learn what you desire. Free peer-to-peer collaboration.</p>
+
+      <div class="tabs">
+        <button class="tab active" data-action="authTab" data-tab="login">Log In</button>
+        <button class="tab" data-action="authTab" data-tab="register">Sign Up</button>
+        <button class="tab" data-action="authTab" data-tab="demo">Quick Demo</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" data-form="login">
+        <label>
+          <span>Email Address</span>
+          <input type="email" name="email" required placeholder="aarav@demo.com" autocomplete="username">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+        </label>
+        <button class="btn primary block glow" type="submit">Log In to SkillSwap</button>
+        <div class="demo-quick-pick">
+          <span class="text-xs muted">Click to auto-fill demo profile:</span>
+          <div class="demo-pills">
+            <button type="button" class="pill-btn" data-action="fillDemo" data-email="ranjani@demo.com">Sivaranjani (Student)</button>
+            <button type="button" class="pill-btn" data-action="fillDemo" data-email="aarav@demo.com">Aarav (Member)</button>
+            <button type="button" class="pill-btn" data-action="fillDemo" data-email="meera@demo.com">Meera (Moderator)</button>
+            <button type="button" class="pill-btn" data-action="fillDemo" data-email="rohan@demo.com">Rohan (Admin)</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" data-form="register" class="hidden">
+        <label>
+          <span>Full Name</span>
+          <input name="name" required placeholder="Alex Rivera">
+        </label>
+        <label>
+          <span>Email Address</span>
+          <input type="email" name="email" required placeholder="alex@campus.edu">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" minlength="4" required placeholder="At least 4 characters">
+        </label>
+        <div class="row2">
+          <label>
+            <span>Role</span>
+            <select name="role">
+              <option value="Student">Student</option>
+              <option value="Professional">Professional</option>
+            </select>
+          </label>
+          <label>
+            <span>Institution / Org</span>
+            <input name="institution" placeholder="e.g. Stanford / Google">
+          </label>
+        </div>
+        <button class="btn primary block glow" type="submit">Create Free Account</button>
+      </form>
+
+      <!-- Quick Demo Picker -->
+      <div id="demoPicker" class="hidden demo-list">
+        <p class="text-sm muted mb-3">Jump instantly into any community member's live dashboard to test reciprocal matching and exchange proposals:</p>
+        <div id="demoUsersGrid" class="demo-users-grid"></div>
+      </div>
+
+      <div class="auth-foot">
+        <span class="badge storage-badge">⚡ Powered by MongoDB Atlas &amp; Socket.IO · Real-Time Multi-User Sync</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Shell -->
+  <div id="app" class="app hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand">
+          <span class="logo">⇄</span>
+          <span>SkillSwap</span>
+        </div>
+        <button class="icon-btn mobile-close-btn" data-action="toggleMenu" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <!-- Quick Switcher in Sidebar -->
+      <div class="profile-switch-card">
+        <div class="profile-switch-header">
+          <span class="text-xs uppercase muted font-bold">Active Persona</span>
+          <span class="level-chip" id="sbLevelChip">Lvl 1</span>
+        </div>
+        <div class="current-user-preview" id="sbUserPreview"></div>
+        <label class="switch-label">
+          <span>Switch Persona:</span>
+          <select id="userQuickSwitch" data-action="quickSwitchUser"></select>
+        </label>
+      </div>
+
+      <nav class="nav-menu" id="nav"></nav>
+
+      <div class="sidebar-foot">
+        <div class="xp-progress-box">
+          <div class="xp-row">
+            <span class="text-xs font-semibold" id="sbXpTitle">Level 1 · Novice</span>
+            <span class="text-xs muted" id="sbXpVal">0 / 250 XP</span>
+          </div>
+          <div class="bar bar-sm xp-bar"><i id="sbXpBar" style="width: 0%"></i></div>
+        </div>
+
+        <button class="btn ghost block logout-btn" data-action="logout">
+          <span>🚪</span> Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrap">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn menu-btn" data-action="toggleMenu" aria-label="Toggle navigation menu">☰</button>
+          <div class="page-title-wrap">
+            <h1 id="pageTitle">Dashboard</h1>
+            <span class="page-subtitle muted text-xs" id="pageSubtitle">Community Skill Exchange &amp; Learning Network</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- MongoDB Atlas Live Indicator -->
+          <div class="storage-pill" id="storageIndicator" title="Data is persistently synchronized with MongoDB Atlas & Socket.IO">
+            <span class="status-dot pulse"></span>
+            <span class="storage-text">MongoDB Live</span>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="icon-btn theme-toggle" data-action="toggleTheme" id="themeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
+            <span id="themeIcon">🌙</span>
+          </button>
+
+          <!-- Notification / Proposal Badge -->
+          <button class="icon-btn notif-btn" data-action="openProposalsTab" title="Exchange Proposals" aria-label="Exchange Proposals">
+            <span>💬</span>
+            <span class="notif-badge hidden" id="proposalCountBadge">0</span>
+          </button>
+
+          <!-- Topbar Avatar / Quick Profile -->
+          <div class="user-pill" data-action="goToProfile" title="View & Edit Profile">
+            <div id="topAvatar"></div>
+            <div class="user-pill-info">
+              <span class="user-pill-name" id="topUserName">Loading...</span>
+              <span class="user-pill-role" id="topUserRole">Member</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic Page Content -->
+      <main id="view" class="main-view"></main>
+    </div>
+  </div>
+
+  <!-- Reusable Modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" data-action="closeModal"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modalTitle">Modal Title</h3>
+        <button class="icon-btn close-modal-btn" data-action="closeModal" aria-label="Close modal">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <!-- Confetti Canvas for Gamification Celebrations -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <!-- Real-Time WebSocket Engine -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+  <script src="community-hub.js"></script>
+</body>
+</html>
