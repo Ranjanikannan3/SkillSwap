@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'Build complete'",
+    "build": "node scripts/build.js",
     "test": "node test/suite.js"
   },
   "dependencies": {
