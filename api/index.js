@@ -3,6 +3,8 @@ try {
   dns.setServers(['8.8.8.8', '1.1.1.1']);
 } catch (e) {}
 
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -68,6 +70,11 @@ const safeIO = {
 };
 app.set('io', safeIO);
 
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '..', 'dist')));
+app.use(express.static(__dirname));
+
 // Mount main API routes
 app.use('/api', apiRouter);
 
@@ -79,6 +86,24 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date(),
     mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
+});
+
+// Fallback to index.html for root and frontend SPA routes
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  const possiblePaths = [
+    path.join(__dirname, 'index.html'),
+    path.join(__dirname, '..', 'index.html'),
+    path.join(__dirname, '..', 'dist', 'index.html')
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      return res.sendFile(p);
+    }
+  }
+  res.status(404).send('SkillSwap: index.html not found');
 });
 
 module.exports = app;
